@@ -478,7 +478,6 @@ const ChallengePage = () => {
                   onRun={handleRunCode}
                   onSubmit={handleSubmitCode}
                   initialCode={code}
-                  language={'python'}
                   isRunning={isExecuting}
                 />
               </div>
