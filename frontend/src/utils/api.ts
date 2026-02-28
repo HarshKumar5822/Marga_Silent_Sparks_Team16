@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Node 17+ and modern browsers sometimes block 'localhost' due to IPv6 routing. 
 // Using 127.0.0.1 explicitly forces IPv4 routing and prevents 'Failed to Fetch' CORS errors.
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://marga-silent-sparks-team16-2.onrender.com/api';
 
 const api = axios.create({
     baseURL: API_URL,

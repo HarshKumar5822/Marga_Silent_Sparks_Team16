@@ -38,7 +38,7 @@ const GamificationDashboard: React.FC = () => {
                     return;
                 }
 
-                const res = await fetch('http://localhost:5000/api/gamification/progress', {
+                const res = await fetch('https://marga-silent-sparks-team16-2.onrender.com/api/gamification/progress', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

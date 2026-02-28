@@ -36,7 +36,7 @@ const LevelMap: React.FC<LevelMapProps> = ({ category, difficulty }) => {
                     'Content-Type': 'application/json'
                 };
 
-                let url = 'http://localhost:5000/api/learning/levels';
+                let url = 'https://marga-silent-sparks-team16-2.onrender.com/api/learning/levels';
                 const params = new URLSearchParams();
                 if (category) params.append('category', category);
                 if (difficulty) params.append('difficulty', difficulty);

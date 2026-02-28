@@ -36,9 +36,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', onLoginSuccess }: A
     setIsLoading(true);
 
     try {
-      const endpoint = mode === 'login'
-        ? 'http://localhost:5000/api/auth/login'
-        : 'http://localhost:5000/api/auth/signup';
+      const url = mode === 'login'
+        ? 'https://marga-silent-sparks-team16-2.onrender.com/api/auth/login'
+        : 'https://marga-silent-sparks-team16-2.onrender.com/api/auth/signup';
 
       const payload = {
         email: formData.email,
@@ -50,7 +50,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', onLoginSuccess }: A
         }),
       };
 
-      const response = await fetch(endpoint, {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
