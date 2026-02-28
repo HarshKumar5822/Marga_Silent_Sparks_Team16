@@ -34,7 +34,7 @@ const Challenges = () => {
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
-        const res = await api.get('/learning/challenges');
+        const res = await api.get('/challenges');
         console.log("Challenges API Response:", res.data);
         setChallenges(res.data);
       } catch (error) {

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Level = require('./models/Learning/Level');
 const Challenge = require('./models/Learning/Challenge');
+const StandaloneChallenge = require('./models/Challenge');
 const Badge = require('./models/Gamification/Badge');
 
 dotenv.config();
@@ -20,9 +21,91 @@ const seedData = async () => {
         }
         await Level.deleteMany({});
         await Challenge.deleteMany({});
+        await StandaloneChallenge.deleteMany({});
         // await Badge.deleteMany({}); // Keep badges for now or clear if needed
 
         // --- Challenge Creation ---
+
+        // --- Standalone Challenges specifically for the Challenges page ---
+        console.log('Seeding Standalone Challenges...');
+        const standaloneData = [
+            {
+                title: "Two Sum", category: "Algorithms", difficulty: "Easy", type: "Algorithm", xpReward: 100,
+                description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+                instructions: "You may assume that each input would have exactly one solution. Example: nums=[2,7,11,15], target=9 -> [0,1].",
+                template: "function twoSum(nums, target) {\n    // Write your code here\n}"
+            },
+            {
+                title: "Reverse String", category: "Strings", difficulty: "Easy", type: "Algorithm", xpReward: 50,
+                description: "Write a function that reverses a string.",
+                instructions: "The input string is given as an array of characters. Modify it in-place. Example: ['h','e','l','l','o'] -> ['o','l','l','e','h'].",
+                template: "function reverseString(s) {\n    // Write your code here\n}"
+            },
+            {
+                title: "Valid Anagram", category: "Strings", difficulty: "Easy", type: "Algorithm", xpReward: 80,
+                description: "Given two strings s and t, return true if t is an anagram of s, and false otherwise.",
+                instructions: "An Anagram is formed by rearranging letters. Example: s='anagram', t='nagaram' -> true.",
+                template: "function isAnagram(s, t) {\n    // Write your code here\n}"
+            },
+            {
+                title: "Maximum Subarray", category: "Dynamic Programming", difficulty: "Medium", type: "Algorithm", xpReward: 150,
+                description: "Given an integer array nums, find the contiguous subarray with the largest sum.",
+                instructions: "Example: [-2,1,-3,4,-1,2,1,-5,4] -> 6 (subarray [4,-1,2,1]).",
+                template: "function maxSubArray(nums) {\n    // Write your code here\n}"
+            },
+            {
+                title: "Merge Intervals", category: "Arrays", difficulty: "Medium", type: "Algorithm", xpReward: 200,
+                description: "Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals.",
+                instructions: "Return an array of the non-overlapping intervals. Example: [[1,3],[2,6],[8,10]] -> [[1,6],[8,10]].",
+                template: "function merge(intervals) {\n    // Write your code here\n}"
+            },
+            {
+                title: "Binary Tree Level Order Traversal", category: "Trees", difficulty: "Medium", type: "Algorithm", xpReward: 180,
+                description: "Given the root of a binary tree, return the level order traversal of its nodes' values.",
+                instructions: "Traverse the tree level by level, from left to right.",
+                template: "function levelOrder(root) {\n    // Write your code here\n}"
+            },
+            {
+                title: "Implement Trie (Prefix Tree)", category: "Data Structures", difficulty: "Medium", type: "Algorithm", xpReward: 250,
+                description: "A trie is a tree used to efficiently store and retrieve keys in a string dataset.",
+                instructions: "Implement the Trie class with insert, search, and startsWith methods.",
+                template: "class Trie {\n    // Write your methods here\n}"
+            },
+            {
+                title: "Word Search", category: "Backtracking", difficulty: "Hard", type: "Algorithm", xpReward: 350,
+                description: "Given an m x n grid of characters board and a string word, return true if word exists.",
+                instructions: "Construct the word from sequentially adjacent cells horizontally or vertically.",
+                template: "function exist(board, word) {\n    // Write your code here\n}"
+            },
+            {
+                title: "LRU Cache", category: "Design", difficulty: "Hard", type: "Algorithm", xpReward: 400,
+                description: "Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.",
+                instructions: "Implement the LRUCache class with get and put methods running in O(1) time.",
+                template: "class LRUCache {\n    // Write your methods here\n}"
+            },
+            {
+                title: "Longest Substring Without Repeating", category: "Strings", difficulty: "Medium", type: "Algorithm", xpReward: 200,
+                description: "Given a string s, find the length of the longest substring without repeating characters.",
+                instructions: "Example: 'abcabcbb' -> 3 ('abc').",
+                template: "function lengthOfLongestSubstring(s) {\n    // Write your code here\n}"
+            }
+        ];
+
+        for (const data of standaloneData) {
+            await StandaloneChallenge.create({
+                title: data.title,
+                description: data.description,
+                difficulty: data.difficulty,
+                category: data.category,
+                type: data.type,
+                xpReward: data.xpReward,
+                instructions: data.instructions,
+                template: data.template
+            });
+        }
+        console.log(`Seeded ${standaloneData.length} Standalone Challenges!`);
+
+        // --- Learning Path Challenge Creation ---
 
         // --- Definition of Stacks ---
         const stacks = [
