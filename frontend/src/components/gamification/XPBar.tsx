@@ -8,8 +8,11 @@ interface XPBarProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const XPBar = ({ currentXP, maxXP, level, showLabels = true, size = 'md' }: XPBarProps) => {
-  const progress = (currentXP / maxXP) * 100;
+const XPBar = ({ currentXP = 0, maxXP = 100, level = 1, showLabels = true, size = 'md' }: XPBarProps) => {
+  const safeCurrent = currentXP || 0;
+  const safeMax = maxXP || 100;
+  const safeLevel = level || 1;
+  const progress = (safeCurrent / safeMax) * 100;
 
   const sizeClasses = {
     sm: 'h-2',
@@ -23,15 +26,15 @@ const XPBar = ({ currentXP, maxXP, level, showLabels = true, size = 'md' }: XPBa
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="level-badge px-3 py-1 rounded-full text-sm">
-              LVL {level}
+              LVL {safeLevel}
             </div>
           </div>
           <span className="text-sm text-muted-foreground font-mono">
-            {currentXP.toLocaleString()} / {maxXP.toLocaleString()} XP
+            {safeCurrent.toLocaleString()} / {safeMax.toLocaleString()} XP
           </span>
         </div>
       )}
-      
+
       <div className={`relative w-full ${sizeClasses[size]} bg-muted rounded-full overflow-hidden`}>
         <motion.div
           initial={{ width: 0 }}
@@ -39,7 +42,7 @@ const XPBar = ({ currentXP, maxXP, level, showLabels = true, size = 'md' }: XPBa
           transition={{ duration: 1, ease: 'easeOut' }}
           className="absolute inset-y-0 left-0 xp-bar rounded-full"
         />
-        
+
         {/* Shine effect */}
         <motion.div
           initial={{ x: '-100%' }}

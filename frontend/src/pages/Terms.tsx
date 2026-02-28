@@ -16,11 +16,11 @@ const Terms = () => {
                         <div className="prose prose-invert max-w-none text-muted-foreground">
                             <p>Last updated: December 30, 2024</p>
                             <p>
-                                Please read these Terms of Service carefully before using CodeGalaxy.
+                                Please read these Terms of Service carefully before using Marga.
                             </p>
                             <h2 className="text-2xl font-bold text-foreground mt-8 mb-4">Acceptance of Terms</h2>
                             <p>
-                                By accessing or using CodeGalaxy, you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the service.
+                                By accessing or using Marga, you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the service.
                             </p>
                             <h2 className="text-2xl font-bold text-foreground mt-8 mb-4">User Accounts</h2>
                             <p>

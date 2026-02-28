@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeySlice – Typing Master (Infinity Edition)</title>
+    <style>
+        :root {
+            --primary: #00ff88;
+            --secondary: #ff0055;
+            --bg: #0f172a;
+            --surface: #1e293b;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #game-ui {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 64px;
+            margin-bottom: 10px;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--bg);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--primary);
+        }
+
+        #streak-pop {
+            position: absolute;
+            top: 100px;
+            font-size: 20px;
+            color: gold;
+            font-weight: bold;
+            pointer-events: none;
+            transition: 0.5s;
+            opacity: 0;
+        }
+
+        .shake {
+            animation: shake 0.3s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-ui">
+        <div class="stat-box">
+            <div class="stat-label">Score</div>
+            <div id="score" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Level</div>
+            <div id="level-name" class="stat-value">Beginner</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Perfect Streak</div>
+            <div id="streak" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Integrity</div>
+            <div id="lives" class="stat-value" style="color: var(--secondary);">3.0</div>
+        </div>
+    </div>
+
+    <div id="streak-pop">LIFE REGEN!</div>
+
+    <div id="canvas-container">
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div id="start-screen" class="overlay">
+        <h1>KeySlice Infinity</h1>
+        <p style="color: #94a3b8; margin-bottom: 10px;">Beginner: Fast Letters</p>
+        <p style="color: #94a3b8; margin-bottom: 10px;">Intermediate: 4 Perfect Words = +0.5 Life</p>
+        <p style="color: #94a3b8; margin-bottom: 30px;">Advanced: 3 Perfect Words = +1 Life</p>
+        <button class="btn" onclick="startGame()">START MISSION</button>
+    </div>
+
+    <div id="game-over" class="overlay" style="display: none;">
+        <h1 style="color: var(--secondary);">MISSION FAILED</h1>
+        <div id="final-stats" style="margin-bottom: 30px; line-height: 1.6;"></div>
+        <button class="btn" onclick="location.reload()">TRY AGAIN <br><span
+                style="font-size: 14px; font-weight: normal; margin-top: 10px; display: block;">or <a href="/"
+                    style="color: white; text-decoration: underline;">Return to Marga</a></span></button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Massive Word Database
+        const WORD_LISTS = {
+            beginner: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
+            intermediate: ["FIRE", "WATER", "EARTH", "WIND", "BIRD", "FISH", "TREE", "ROAD", "GOLD", "BLUE", "FAST", "SLOW", "MOON", "STAR", "PLAY", "WORK", "BOOK", "CITY", "ZONE", "KING", "TIME", "LIFE", "MIND", "SOUL", "HEAT", "COLD", "DARK", "LIGHT", "RAIN", "SNOW"],
+            advanced: ["COMPUTER", "ALGORITHM", "KEYBOARD", "UNIVERSE", "VELOCITY", "PYRAMID", "MOUNTAIN", "DATABASE", "FRACTION", "ASTRONOMY", "KEYSLICE", "DYNAMIC", "CONSTANT", "PROBABLE", "SOLUTION", "REACTION", "ZODIAC", "QUANTUM", "SYMPHONY", "JOURNAL", "PLATFORM", "REVOLVE", "HORIZONTAL", "VERTICAL", "SPECTRUM", "TERMINAL", "NAVIGATE", "CRITICAL", "EXPONENT", "MECHANIC"]
+        };
+
+        let state = {
+            score: 0,
+            lives: 3.0,
+            level: 'beginner',
+            fruits: [],
+            startTime: null,
+            totalCharsTyped: 0,
+            correctCharsTyped: 0,
+            gameActive: false,
+            currentTarget: null,
+            inputBuffer: "",
+            perfectStreak: 0,
+            mistakeInCurrentWord: false
+        };
+
+        class Fruit {
+            constructor(text, speedBase) {
+                this.text = text;
+                this.x = Math.random() * (canvas.width - 250) + 125;
+                this.y = -50;
+                this.speed = speedBase + (Math.random() * 0.5);
+                this.radius = 35 + (text.length * 8);
+                this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                this.isSliced = false;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotSpeed = (Math.random() - 0.5) * 0.04;
+                this.opacity = 1;
+                this.halfX1 = 0; this.halfY1 = 0;
+                this.halfX2 = 0; this.halfY2 = 0;
+            }
+
+            update() {
+                if (!this.isSliced) {
+                    this.y += this.speed;
+                    this.rotation += this.rotSpeed;
+                    if (this.y > canvas.height + 100) return 'missed';
+                } else {
+                    this.opacity -= 0.03;
+                    this.halfX1 -= 3; this.halfY1 += 6;
+                    this.halfX2 += 3; this.halfY2 += 6;
+                }
+                return 'active';
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+
+                if (!this.isSliced) {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    ctx.rotate(-this.rotation);
+                    ctx.font = `bold ${Math.max(20, this.radius * 0.4)}px monospace`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    const typedPart = state.currentTarget === this ? state.inputBuffer : "";
+                    ctx.fillStyle = "rgba(0,0,0,0.4)";
+                    ctx.fillText(this.text, 2, 2);
+
+                    ctx.fillStyle = "white";
+                    ctx.fillText(this.text, 0, 0);
+
+                    if (typedPart.length > 0) {
+                        ctx.fillStyle = "#00ff88";
+                        const fullWidth = ctx.measureText(this.text).width;
+                        ctx.textAlign = 'left';
+                        ctx.fillText(typedPart, -fullWidth / 2, 0);
+                    }
+                } else {
+                    ctx.globalAlpha = this.opacity;
+                    ctx.fillStyle = this.color;
+                    ctx.save();
+                    ctx.translate(this.halfX1, this.halfY1);
+                    ctx.beginPath(); ctx.arc(0, 0, this.radius, Math.PI, 0); ctx.fill();
+                    ctx.restore();
+                    ctx.save();
+                    ctx.translate(this.halfX2, this.halfY2);
+                    ctx.beginPath(); ctx.arc(0, 0, this.radius, 0, Math.PI); ctx.fill();
+                    ctx.restore();
+                }
+                ctx.restore();
+            }
+
+            slice() { this.isSliced = true; }
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        window.addEventListener('keydown', (e) => {
+            if (!state.gameActive) return;
+            const char = e.key.toUpperCase();
+            if (char.length !== 1) return;
+
+            state.totalCharsTyped++;
+
+            if (!state.currentTarget) {
+                const match = state.fruits.find(f => !f.isSliced && f.text.startsWith(char));
+                if (match) {
+                    state.currentTarget = match;
+                    state.inputBuffer = char;
+                    state.correctCharsTyped++;
+                    state.mistakeInCurrentWord = false; // Reset mistake flag for new word
+                    checkWordComplete();
+                } else {
+                    triggerMiss();
+                }
+            } else {
+                const expectedChar = state.currentTarget.text[state.inputBuffer.length];
+                if (char === expectedChar) {
+                    state.inputBuffer += char;
+                    state.correctCharsTyped++;
+                    checkWordComplete();
+                } else {
+                    state.mistakeInCurrentWord = true; // Flag mistake
+                    triggerMiss();
+                }
+            }
+            updateStats();
+        });
+
+        function checkWordComplete() {
+            if (state.inputBuffer === state.currentTarget.text) {
+                state.currentTarget.slice();
+                state.score += state.currentTarget.text.length * 10;
+
+                // Streak Logic
+                if (!state.mistakeInCurrentWord) {
+                    state.perfectStreak++;
+                    handleLifeRegen();
+                } else {
+                    state.perfectStreak = 0;
+                }
+
+                state.currentTarget = null;
+                state.inputBuffer = "";
+
+                // Progression
+                if (state.score > 800) state.level = 'advanced';
+                else if (state.score > 250) state.level = 'intermediate';
+            }
+        }
+
+        function handleLifeRegen() {
+            let regenAmount = 0;
+            if (state.level === 'intermediate' && state.perfectStreak >= 4) {
+                regenAmount = 0.5;
+                state.perfectStreak = 0;
+            } else if (state.level === 'advanced' && state.perfectStreak >= 3) {
+                regenAmount = 1.0;
+                state.perfectStreak = 0;
+            }
+
+            if (regenAmount > 0) {
+                state.lives = Math.min(5.0, state.lives + regenAmount); // Max 5 lives
+                showStreakPop(`+${regenAmount} LIFE!`);
+            }
+        }
+
+        function showStreakPop(txt) {
+            const pop = document.getElementById('streak-pop');
+            pop.innerText = txt;
+            pop.style.opacity = '1';
+            setTimeout(() => pop.style.opacity = '0', 1000);
+        }
+
+        function triggerMiss() {
+            document.body.classList.add('shake');
+            setTimeout(() => document.body.classList.remove('shake'), 200);
+        }
+
+        function updateStats() {
+            document.getElementById('score').innerText = state.score;
+            document.getElementById('level-name').innerText = state.level.charAt(0).toUpperCase() + state.level.slice(1);
+            document.getElementById('streak').innerText = state.perfectStreak;
+
+            // Formatted Life display
+            let livesVal = state.lives.toFixed(1);
+            document.getElementById('lives').innerText = livesVal;
+
+            const timeElapsed = (Date.now() - state.startTime) / 60000;
+            const wpm = Math.round((state.correctCharsTyped / 5) / timeElapsed) || 0;
+            const acc = Math.round((state.correctCharsTyped / state.totalCharsTyped) * 100) || 100;
+        }
+
+        function spawnFruit() {
+            if (!state.gameActive) return;
+
+            let pool = WORD_LISTS[state.level];
+            let text = pool[Math.floor(Math.random() * pool.length)];
+
+            // Prevent immediate duplicates
+            const activeChars = state.fruits.filter(f => !f.isSliced).map(f => f.text[0]);
+            if (activeChars.includes(text[0]) && activeChars.length < 5) {
+                text = pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            // LEVEL SPEED LOGIC
+            let speed = 1.5;
+            if (state.level === 'beginner') speed = 3.0; // FAST
+            if (state.level === 'intermediate') speed = 4.5; // VERY FAST
+            if (state.level === 'advanced') speed = 2.2; // SLIGHTLY SLOW FOR COMPLEX WORDS
+
+            state.fruits.push(new Fruit(text, speed));
+
+            // Spawn Frequency
+            let nextSpawn = 1800 - (state.score / 2);
+            if (state.level === 'beginner') nextSpawn = 800;
+            if (state.level === 'advanced') nextSpawn = 1500;
+
+            setTimeout(spawnFruit, Math.max(500, nextSpawn));
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            state.gameActive = true;
+            state.startTime = Date.now();
+            state.lives = 3.0;
+            state.score = 0;
+            state.perfectStreak = 0;
+            spawnFruit();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            state.gameActive = false;
+            document.getElementById('game-over').style.display = 'flex';
+            const timeElapsed = (Date.now() - state.startTime) / 60000;
+            const wpm = Math.round((state.correctCharsTyped / 5) / timeElapsed) || 0;
+            document.getElementById('final-stats').innerHTML = `
+            SCORE: ${state.score}<br>
+            SPEED: ${wpm} WPM<br>
+            LEVEL: ${state.level.toUpperCase()}
+        `;
+        }
+
+        function gameLoop() {
+            if (!state.gameActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = state.fruits.length - 1; i >= 0; i--) {
+                const fruit = state.fruits[i];
+                const status = fruit.update();
+
+                if (status === 'missed') {
+                    state.lives -= 1.0;
+                    state.perfectStreak = 0;
+                    state.fruits.splice(i, 1);
+                    if (state.currentTarget === fruit) {
+                        state.currentTarget = null;
+                        state.inputBuffer = "";
+                    }
+                    updateStats();
+                    if (state.lives <= 0) gameOver();
+                    continue;
+                }
+
+                if (fruit.isSliced && fruit.opacity <= 0) {
+                    state.fruits.splice(i, 1);
+                    continue;
+                }
+                fruit.draw();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+    </script>
+</body>
+
+</html>

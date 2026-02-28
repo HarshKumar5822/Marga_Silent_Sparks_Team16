@@ -32,10 +32,9 @@ const Landing = () => {
     // Check for logged-in user
     const storedUserInfo = localStorage.getItem('userInfo');
     if (storedUserInfo) {
-      // If user is logged in, redirect to dashboard immediately
-      navigate('/dashboard', { replace: true });
+      setUserInfo(JSON.parse(storedUserInfo));
     }
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -195,7 +194,7 @@ const Landing = () => {
                   <div className="w-3 h-3 rounded-full bg-green-500/50" />
                 </div>
                 <div className="flex-1 text-center">
-                  <span className="text-xs text-muted-foreground">codegalaxy.dev/challenge/linked-list</span>
+                  <span className="text-xs text-muted-foreground">marga.dev/challenge/linked-list</span>
                 </div>
               </div>
 
@@ -303,7 +302,7 @@ const Landing = () => {
             <h2 className="font-display text-4xl font-bold text-foreground mb-4">
               Why Choose{' '}
               <span className="bg-gradient-to-r from-cq-cyan to-cq-purple bg-clip-text text-transparent">
-                CodeGalaxy
+                Marga
               </span>
               ?
             </h2>
@@ -376,7 +375,7 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Code2 className="h-5 w-5 text-primary" />
-            <span className="font-display font-bold text-foreground">CodeGalaxy</span>
+            <span className="font-display font-bold text-foreground">Marga</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
@@ -386,7 +385,7 @@ const Landing = () => {
             <Link to="/feedback" className="hover:text-foreground transition-colors">Feedback</Link>
           </div>
           <p className="text-sm text-muted-foreground">
-            © 2024 CodeGalaxy. All rights reserved.
+            © 2024 Marga. All rights reserved.
           </p>
         </div>
       </footer>
@@ -396,9 +395,13 @@ const Landing = () => {
         isOpen={authModal.isOpen}
         onClose={() => setAuthModal({ ...authModal, isOpen: false })}
         initialMode={authModal.mode}
-        onLoginSuccess={(user) => {
+        onLoginSuccess={(user, isSignup) => {
           setUserInfo(user);
-          navigate('/dashboard');
+          if (isSignup) {
+            navigate('/questionnaire');
+          } else {
+            navigate('/dashboard');
+          }
         }}
       />
     </div>

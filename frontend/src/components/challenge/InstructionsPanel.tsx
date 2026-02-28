@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Lightbulb, CheckCircle2, Circle, BookOpen } from 'lucide-react';
+import { ChevronRight, Lightbulb, CheckCircle2, Circle, BookOpen, PenLine } from 'lucide-react';
 import { ChallengeStep } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import NotesPanel from './NotesPanel';
 
 interface InstructionsPanelProps {
   title: string;
@@ -12,6 +14,7 @@ interface InstructionsPanelProps {
   onStepComplete?: (stepId: number) => void;
   showHint?: boolean;
   onHintToggle?: () => void;
+  challengeId: string;
 }
 
 const InstructionsPanel = ({
@@ -20,155 +23,171 @@ const InstructionsPanel = ({
   steps,
   currentStepIndex,
   onStepComplete,
-  showHint = false,
-  onHintToggle,
+  challengeId,
 }: InstructionsPanelProps) => {
+  const [activeTab, setActiveTab] = useState<'instructions' | 'notes'>('instructions');
   const [expandedStep, setExpandedStep] = useState<number | null>(currentStepIndex);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   return (
     <div className="h-full flex flex-col rounded-xl border border-border/50 bg-card overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b border-border/50 bg-muted/30">
-        <div className="flex items-center gap-2 text-sm text-primary mb-2">
+      {/* Tabs Header */}
+      <div className="flex border-b border-border/50 bg-muted/30">
+        <button
+          onClick={() => setActiveTab('instructions')}
+          className={cn(
+            "flex-1 py-3 text-sm font-medium border-b-2 transition-colors flex items-center justify-center gap-2",
+            activeTab === 'instructions'
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
           <BookOpen className="h-4 w-4" />
-          <span className="font-medium">Challenge Instructions</span>
-        </div>
-        <h2 className="font-display text-xl font-bold text-foreground">{title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+          Instructions
+        </button>
+        <button
+          onClick={() => setActiveTab('notes')}
+          className={cn(
+            "flex-1 py-3 text-sm font-medium border-b-2 transition-colors flex items-center justify-center gap-2",
+            activeTab === 'notes'
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <PenLine className="h-4 w-4" />
+          Notes
+        </button>
       </div>
 
-      {/* Progress indicator */}
-      <div className="px-4 py-3 border-b border-border/50">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Progress:</span>
-          <div className="flex items-center gap-1">
-            {steps.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-colors ${index < currentStepIndex
-                  ? 'bg-cq-green'
-                  : index === currentStepIndex
-                    ? 'bg-cq-cyan'
-                    : 'bg-muted-foreground/30'
-                  }`}
-              />
-            ))}
-          </div>
-          <span className="ml-auto font-mono">
-            {currentStepIndex + 1}/{steps.length}
-          </span>
-        </div>
-      </div>
+      <div className="flex-1 overflow-hidden relative">
+        {activeTab === 'notes' ? (
+          <NotesPanel challengeId={challengeId} />
+        ) : (
+          <div className="flex flex-col h-full">
+            {/* Header Content for Instructions */}
+            <div className="p-4 border-b border-border/50 bg-muted/10">
+              <h2 className="font-display text-xl font-bold text-foreground">{title}</h2>
+              <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{description}</p>
+            </div>
 
-      {/* Steps list */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin p-4 space-y-3">
-        {steps.map((step, index) => {
-          const isCompleted = index < currentStepIndex;
-          const isCurrent = index === currentStepIndex;
-          const isLocked = index > currentStepIndex;
+            {/* Progress indicator */}
+            <div className="px-4 py-2 border-b border-border/50 flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Progress</span>
+              <span className="text-xs font-mono text-foreground font-medium">
+                {currentStepIndex + 1}/{steps.length}
+              </span>
+            </div>
 
-          return (
-            <motion.div
-              key={step.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`rounded-lg border transition-all ${isCurrent
-                ? 'border-primary bg-primary/5'
-                : isCompleted
-                  ? 'border-cq-green/30 bg-cq-green/5'
-                  : 'border-border/50 bg-muted/20 opacity-50'
-                }`}
-            >
-              <button
-                onClick={() => setExpandedStep(expandedStep === index ? null : index)}
-                className="w-full flex items-start gap-3 p-3 text-left"
-                disabled={isLocked}
-              >
-                {/* Status icon */}
-                <div className="mt-0.5">
-                  {isCompleted ? (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring' }}
+            {/* Steps list */}
+            <div className="flex-1 overflow-y-auto scrollbar-thin p-4 space-y-3">
+              {steps.map((step, index) => {
+                const isCompleted = index < currentStepIndex;
+                const isCurrent = index === currentStepIndex;
+                const isLocked = index > currentStepIndex;
+
+                return (
+                  <motion.div
+                    key={step.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`rounded-lg border transition-all ${isCurrent
+                      ? 'border-primary bg-primary/5'
+                      : isCompleted
+                        ? 'border-cq-green/30 bg-cq-green/5'
+                        : 'border-border/50 bg-muted/20 opacity-50'
+                      }`}
+                  >
+                    <button
+                      onClick={() => setExpandedStep(expandedStep === index ? null : index)}
+                      className="w-full flex items-start gap-3 p-3 text-left"
+                      disabled={isLocked}
                     >
-                      <CheckCircle2 className="h-5 w-5 text-cq-green" />
-                    </motion.div>
-                  ) : isCurrent ? (
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      <Circle className="h-5 w-5 text-primary fill-primary/20" />
-                    </motion.div>
-                  ) : (
-                    <Circle className="h-5 w-5 text-muted-foreground/50" />
-                  )}
-                </div>
+                      {/* Status icon */}
+                      <div className="mt-0.5">
+                        {isCompleted ? (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring' }}
+                          >
+                            <CheckCircle2 className="h-5 w-5 text-cq-green" />
+                          </motion.div>
+                        ) : isCurrent ? (
+                          <motion.div
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                          >
+                            <Circle className="h-5 w-5 text-primary fill-primary/20" />
+                          </motion.div>
+                        ) : (
+                          <Circle className="h-5 w-5 text-muted-foreground/50" />
+                        )}
+                      </div>
 
-                {/* Step content */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-muted-foreground">
-                      Step {step.id}
-                    </span>
-                    {isCurrent && (
-                      <span className="text-xs font-medium text-primary px-2 py-0.5 rounded-full bg-primary/10">
-                        Current
-                      </span>
+                      {/* Step content */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-muted-foreground">
+                            Step {step.id}
+                          </span>
+                          {isCurrent && (
+                            <span className="text-xs font-medium text-primary px-2 py-0.5 rounded-full bg-primary/10">
+                              Current
+                            </span>
+                          )}
+                        </div>
+                        <p className={`mt-1 text-sm font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground'}`}>
+                          {step.instruction}
+                        </p>
+                      </div>
+
+                      {/* Expand indicator */}
+                      <ChevronRight
+                        className={`h-4 w-4 text-muted-foreground transition-transform ${expandedStep === index ? 'rotate-90' : ''
+                          }`}
+                      />
+                    </button>
+
+                    {/* Expanded content */}
+                    {expandedStep === index && !isLocked && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="px-3 pb-3"
+                      >
+                        {/* Details if needed */}
+                      </motion.div>
                     )}
-                  </div>
-                  <p className={`mt-1 text-sm font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground'}`}>
-                    {step.instruction}
-                  </p>
-                </div>
+                  </motion.div>
+                );
+              })}
+            </div>
 
-                {/* Expand indicator */}
-                <ChevronRight
-                  className={`h-4 w-4 text-muted-foreground transition-transform ${expandedStep === index ? 'rotate-90' : ''
-                    }`}
-                />
-              </button>
+            {/* Action button */}
+            <div className="p-4 border-t border-border/50 space-y-3">
+              <Button
+                variant="outline"
+                className="w-full gap-2 border-cq-gold/50 text-cq-gold hover:bg-cq-gold/10 hover:text-cq-gold"
+                onClick={() => setIsGuideOpen(true)}
+              >
+                <Lightbulb className="h-4 w-4" />
+                Mission Guide & Hints
+              </Button>
 
-              {/* Expanded content */}
-              {expandedStep === index && !isLocked && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="px-3 pb-3"
-                >
-                  {/* Hint button removed in favor of Mission Guide */}
-                </motion.div>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Action button */}
-      <div className="p-4 border-t border-border/50 space-y-3">
-        {/* Mission Guide Button */}
-        <Button
-          variant="outline"
-          className="w-full gap-2 border-cq-gold/50 text-cq-gold hover:bg-cq-gold/10 hover:text-cq-gold"
-          onClick={() => setIsGuideOpen(true)}
-        >
-          <Lightbulb className="h-4 w-4" />
-          Mission Guide & Hints
-        </Button>
-
-        <Button
-          variant="success"
-          className="w-full"
-          onClick={() => onStepComplete?.(steps[currentStepIndex]?.id)}
-          disabled={currentStepIndex >= steps.length}
-        >
-          <CheckCircle2 className="h-4 w-4 mr-2" />
-          {currentStepIndex >= steps.length ? 'Challenge Complete!' : 'Mark Step Complete'}
-        </Button>
+              <Button
+                variant="success"
+                className="w-full"
+                onClick={() => onStepComplete?.(steps[currentStepIndex]?.id)}
+                disabled={currentStepIndex >= steps.length}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                {currentStepIndex >= steps.length ? 'Challenge Complete!' : 'Mark Step Complete'}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Guide Modal */}

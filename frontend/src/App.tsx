@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
+import MargaDashboard from "./pages/MargaDashboard";
 import ChallengePage from "./pages/ChallengePage";
 import Challenges from "./pages/Challenges";
 import Leaderboard from "./pages/Leaderboard";
@@ -18,6 +19,10 @@ import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import Feedback from "./pages/Feedback";
 import ForgotPassword from "./pages/ForgotPassword";
+import LearningPage from "./pages/LearningPage";
+import Questionnaire from "./pages/Questionnaire";
+import AIChatbot from "./components/Marga/Learning/AIChatbot";
+import TeacherDashboard from "./pages/TeacherDashboard";
 
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -63,15 +68,32 @@ const App = () => (
                 <Badges />
               </ProtectedRoute>
             } />
+            <Route path="/learning" element={
+              <ProtectedRoute>
+                <LearningPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/learning-path" element={
+              <ProtectedRoute>
+                <MargaDashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/feedback" element={<Feedback />} />
+            <Route path="/teacher" element={
+              <ProtectedRoute>
+                <TeacherDashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/questionnaire" element={<ProtectedRoute><Questionnaire /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <AIChatbot />
         </BrowserRouter>
       </ThemeProvider>
     </TooltipProvider>

@@ -12,7 +12,7 @@ const Settings = () => {
     const navigate = useNavigate();
     const [userInfo] = useState(() => {
         const saved = localStorage.getItem('userInfo');
-        return saved ? JSON.parse(saved) : { name: 'Adventurer', email: 'adventurer@codegalaxy.dev' };
+        return saved ? JSON.parse(saved) : { name: 'Adventurer', email: 'adventurer@marga.dev' };
     });
 
     const handleLogout = () => {

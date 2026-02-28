@@ -45,7 +45,7 @@ const Register = () => {
                 description: 'Your coding journey begins now!',
             });
 
-            navigate('/dashboard');
+            navigate('/questionnaire');
         } catch (error: any) {
             toast.error(error.message || 'Something went wrong');
         } finally {

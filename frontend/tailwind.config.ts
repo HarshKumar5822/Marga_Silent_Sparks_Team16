@@ -57,7 +57,7 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // CodeGalaxy custom colors
+        // Marga custom colors
         cq: {
           dark: "hsl(var(--cq-bg-dark))",
           medium: "hsl(var(--cq-bg-medium))",

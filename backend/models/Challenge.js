@@ -14,13 +14,38 @@ const challengeSchema = mongoose.Schema({
         enum: ['Easy', 'Medium', 'Hard'],
         required: true
     },
+    category: {
+        type: String,
+        default: 'General'
+    },
+    type: {
+        type: String,
+        default: 'Algorithm'
+    },
+    xpReward: {
+        type: Number,
+        default: 100
+    },
+    instructions: {
+        type: String,
+        default: ''
+    },
     testCases: [{
         input: String,
-        output: String
+        expectedOutput: String,
+        isHidden: { type: Boolean, default: false }
     }],
     template: {
         type: String, // Starter code
         default: ''
+    },
+    isLocked: {
+        type: Boolean,
+        default: false
+    },
+    isCompleted: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

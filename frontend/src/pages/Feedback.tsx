@@ -18,7 +18,7 @@ const Feedback = () => {
         // Mock submission
         console.log({ rating, category, message });
         toast.success("Thank you for your feedback!", {
-            description: "We've received your thoughts and will use them to improve CodeGalaxy."
+            description: "We've received your thoughts and will use them to improve Marga."
         });
         // Reset form
         setRating(0);
@@ -38,7 +38,7 @@ const Feedback = () => {
                         <div className="text-center mb-10">
                             <h1 className="font-display text-4xl font-bold text-foreground mb-4">We Value Your Feedback</h1>
                             <p className="text-muted-foreground text-lg">
-                                Help us make CodeGalaxy better. Share your thoughts, report bugs, or suggest new features.
+                                Help us make Marga better. Share your thoughts, report bugs, or suggest new features.
                             </p>
                         </div>
 
@@ -59,8 +59,8 @@ const Feedback = () => {
                                             >
                                                 <Star
                                                     className={`h-8 w-8 transition-colors ${star <= (hoverRating || rating)
-                                                            ? 'text-cq-gold fill-cq-gold'
-                                                            : 'text-muted-foreground/30'
+                                                        ? 'text-cq-gold fill-cq-gold'
+                                                        : 'text-muted-foreground/30'
                                                         }`}
                                                 />
                                             </button>

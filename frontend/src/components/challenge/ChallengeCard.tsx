@@ -8,16 +8,22 @@ interface ChallengeCardProps {
   index: number;
 }
 
-const difficultyColors = {
+const difficultyColors: Record<string, string> = {
   beginner: 'from-cq-green to-emerald-600',
   intermediate: 'from-cq-cyan to-blue-600',
   advanced: 'from-cq-purple to-pink-600',
+  Easy: 'from-cq-green to-emerald-600',
+  Medium: 'from-cq-cyan to-blue-600',
+  Hard: 'from-cq-purple to-pink-600',
 };
 
-const difficultyLabels = {
+const difficultyLabels: Record<string, string> = {
   beginner: 'Beginner',
   intermediate: 'Intermediate',
   advanced: 'Advanced',
+  Easy: 'Beginner',
+  Medium: 'Intermediate',
+  Hard: 'Advanced',
 };
 
 const ChallengeCard = ({ challenge, index }: ChallengeCardProps) => {
@@ -32,7 +38,7 @@ const ChallengeCard = ({ challenge, index }: ChallengeCardProps) => {
       className={`relative group ${!isAccessible ? 'opacity-60' : ''}`}
     >
       {isAccessible ? (
-        <Link to={`/challenge/${challenge.id}`}>
+        <Link to={`/challenge/${challenge._id || challenge.id}`}>
           <CardContent challenge={challenge} />
         </Link>
       ) : (
@@ -75,7 +81,7 @@ const CardContent = ({ challenge }: { challenge: Challenge }) => (
 
     {/* Category */}
     <span className="text-xs text-muted-foreground uppercase tracking-wider">
-      {challenge.category}
+      {challenge.category || challenge.type || 'General'}
     </span>
 
     {/* Title */}

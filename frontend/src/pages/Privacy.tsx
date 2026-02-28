@@ -16,7 +16,7 @@ const Privacy = () => {
                         <div className="prose prose-invert max-w-none text-muted-foreground">
                             <p>Last updated: December 30, 2024</p>
                             <p>
-                                At CodeGalaxy, we take your privacy seriously. This Privacy Policy describes how we collect, use, and protect your personal information.
+                                At Marga, we take your privacy seriously. This Privacy Policy describes how we collect, use, and protect your personal information.
                             </p>
                             <h2 className="text-2xl font-bold text-foreground mt-8 mb-4">Information We Collect</h2>
                             <p>

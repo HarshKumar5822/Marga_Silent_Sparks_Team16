@@ -9,7 +9,7 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialMode?: 'login' | 'signup';
-  onLoginSuccess?: (user: any) => void;
+  onLoginSuccess?: (user: any, isSignup: boolean) => void;
 }
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login', onLoginSuccess }: AuthModalProps) => {
@@ -66,7 +66,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login', onLoginSuccess }: A
 
       localStorage.setItem('userInfo', JSON.stringify(data));
       if (onLoginSuccess) {
-        onLoginSuccess(data);
+        onLoginSuccess(data, mode === 'signup');
       }
 
       if (mode === 'login') {

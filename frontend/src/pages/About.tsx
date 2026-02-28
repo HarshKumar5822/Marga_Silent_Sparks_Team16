@@ -12,10 +12,10 @@ const About = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-8"
                     >
-                        <h1 className="font-display text-4xl font-bold text-foreground">About CodeGalaxy</h1>
+                        <h1 className="font-display text-4xl font-bold text-foreground">About Marga</h1>
                         <div className="prose prose-invert max-w-none text-muted-foreground">
                             <p className="text-lg">
-                                CodeGalaxy is a platform designed to make learning algorithms and data structures engaging, interactive, and fun.
+                                Marga is a platform designed to make learning algorithms and data structures engaging, interactive, and fun.
                             </p>
                             <p>
                                 We believe that the best way to master complex programming concepts is through hands-on practice and visualization. Our mission is to bridge the gap between abstract theory and practical application.

@@ -1,29 +1,61 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Layers } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import ChallengeCard from '@/components/challenge/ChallengeCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { mockChallenges } from '@/data/mockData';
+import api from '@/utils/api';
+
+// Define interface matching backend response + frontend needs
+interface Challenge {
+  _id: string;
+  id?: string; // Fallback
+  title: string;
+  description: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  xpReward: number;
+  category: string;
+  isLocked?: boolean;
+  isCompleted?: boolean;
+  type?: string;
+}
 
 type FilterType = 'all' | 'beginner' | 'intermediate' | 'advanced';
 type StatusType = 'all' | 'completed' | 'inProgress' | 'locked';
 
 const Challenges = () => {
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<FilterType>('all');
   const [statusFilter, setStatusFilter] = useState<StatusType>('all');
 
-  const filteredChallenges = mockChallenges.filter(challenge => {
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        const res = await api.get('/challenges');
+        console.log("Challenges API Response:", res.data);
+        setChallenges(res.data);
+      } catch (error) {
+        console.error("Failed to fetch challenges API ERROR:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchChallenges();
+  }, []);
+
+  const filteredChallenges = challenges.filter(challenge => {
     // Search filter
     if (searchQuery && !challenge.title.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
 
-    // Difficulty filter
-    if (difficultyFilter !== 'all' && challenge.difficulty !== difficultyFilter) {
-      return false;
+    // Difficulty filter (Backend uses PascalCase 'Easy', 'Medium', 'Hard')
+    if (difficultyFilter !== 'all') {
+      const diffMap: Record<string, string> = { 'beginner': 'Easy', 'intermediate': 'Medium', 'advanced': 'Hard' };
+      if (challenge.difficulty !== diffMap[difficultyFilter]) return false;
     }
 
     // Status filter
@@ -41,6 +73,14 @@ const Challenges = () => {
     { value: 'inProgress', label: 'In Progress' },
     { value: 'locked', label: 'Locked' },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <p>Loading challenges...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -133,13 +173,13 @@ const Challenges = () => {
 
           {/* Results count */}
           <p className="text-sm text-muted-foreground mb-4">
-            Showing {filteredChallenges.length} of {mockChallenges.length} challenges
+            Showing {filteredChallenges.length} of {challenges.length} challenges
           </p>
 
-          {/* Challenge Grid */}
+          {/* Challenge Grid without Category Grouping */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredChallenges.map((challenge, index) => (
-              <ChallengeCard key={challenge.id} challenge={challenge} index={index} />
+              <ChallengeCard key={challenge._id || challenge.id} challenge={challenge as any} index={index} />
             ))}
           </div>
 
