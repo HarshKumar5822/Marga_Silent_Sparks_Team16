@@ -1,16 +1,16 @@
-# 🌌 CodeGalaxy - MERN Stack Project
+# 🌌 Marga - MERN Stack Project
 ### A Gamified & Visual Way to Learn Programming
 
-## 🚀 About CodeGalaxy
+## 🚀 About Marga
 
 Programming is often hard for beginners because they cannot *see* what is happening behind the code.  
 Concepts like loops, data structures, pointers, and algorithms feel confusing when learned only through textbooks or static examples.
 
-**CodeGalaxy** solves this problem by providing a **visual, interactive, and game-based learning platform** where students write code and instantly see **step-by-step execution animations**.
+**Marga** solves this problem by providing a **visual, interactive, and game-based learning platform** where students write code and instantly see **step-by-step execution animations**.
 
 It helps learners understand *how* code works, not just *what* to write.
 
-## 🎮 What Makes CodeGalaxy Special?
+## 🎮 What Makes Marga Special?
 
 - 🎯 **Gamified Learning** – Learn coding like playing a game with levels and challenges  
 - 👀 **Live Code Visualization** – Watch loops, nodes, pointers, and algorithms work in real time  
